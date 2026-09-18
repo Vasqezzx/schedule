@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Расписание группы ИС-252/4</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-8 flex justify-center items-start font-sans">
+
+  <div class="w-full max-w-2xl bg-slate-800/80 backdrop-blur-xl border border-slate-700/60 rounded-3xl p-6 shadow-2xl space-y-6">
+    
+    <!-- Шапка -->
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/50 pb-5">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="bg-blue-500/20 text-blue-400 text-xs font-bold px-2.5 py-1 rounded-full border border-blue-500/30">2 КУРС</span>
+          <span class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-500/30">3 СЕМЕСТР</span>
+        </div>
+        <h1 class="text-2xl font-extrabold text-white mt-2 tracking-tight">Группа ИС-252/4</h1>
+        <p class="text-xs text-slate-400">Казахский университет технологий и бизнеса им. К. Кулажанова</p>
+      </div>
+      <div class="text-right hidden sm:block">
+        <span class="text-xs text-slate-500 block">Учебный год</span>
+        <span class="text-sm font-semibold text-slate-300">2026 – 2027</span>
+      </div>
+    </header>
+
+    <!-- Переключатель дней недели -->
+    <div class="flex gap-1.5 overflow-x-auto pb-2 scrollbar-none text-sm" id="dayTabs">
+      <button onclick="selectDay('mon')" id="tab-mon" class="tab-btn active-tab px-4 py-2 rounded-xl font-semibold transition-all duration-200">ПН</button>
+      <button onclick="selectDay('tue')" id="tab-tue" class="tab-btn inactive-tab px-4 py-2 rounded-xl font-semibold transition-all duration-200">ВТ</button>
+      <button onclick="selectDay('wed')" id="tab-wed" class="tab-btn inactive-tab px-4 py-2 rounded-xl font-semibold transition-all duration-200">СР</button>
+      <button onclick="selectDay('thu')" id="tab-thu" class="tab-btn inactive-tab px-4 py-2 rounded-xl font-semibold transition-all duration-200">ЧТ</button>
+      <button onclick="selectDay('fri')" id="tab-fri" class="tab-btn inactive-tab px-4 py-2 rounded-xl font-semibold transition-all duration-200">ПТ</button>
+      <button onclick="selectDay('sat')" id="tab-sat" class="tab-btn inactive-tab px-4 py-2 rounded-xl font-semibold transition-all duration-200">СБ</button>
+    </div>
+
+    <!-- Заголовок выбранного дня -->
+    <div class="flex items-center justify-between pt-1">
+      <h2 id="dayTitle" class="text-lg font-bold text-slate-200 flex items-center gap-2"></h2>
+      <span id="lessonCount" class="text-xs text-slate-400 font-medium"></span>
+    </div>
+
+    <!-- Карточки пар -->
+    <div id="scheduleContainer" class="space-y-3"></div>
+
+  </div>
+
+  <style>
+    .active-tab {
+      background-color: #3b82f6;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+    }
+    .inactive-tab {
+      background-color: rgba(51, 65, 85, 0.5);
+      color: #94a3b8;
+    }
+    .inactive-tab:hover {
+      background-color: rgba(51, 65, 85, 0.9);
+      color: #f1f5f9;
+    }
+  </style>
+
+  <script>
+    const scheduleData = {
+      mon: {
+        title: "Понедельник",
+        classes: [
+          { time: "14:00 - 14:50", subject: "Основы информационных систем", type: "Лабораторная", teacher: "Амантаев Т.", room: "2/510", badgeColor: "purple" },
+          { time: "15:00 - 15:50", subject: "Основы информационных систем", type: "Лабораторная", teacher: "Амантаев Т.", room: "2/510", badgeColor: "purple" },
+          { time: "16:00 - 16:50", subject: "Теория вероятностей и мат. статистика", type: "Лекция", teacher: "Оспанова Т.Т.", room: "1/306", badgeColor: "blue" },
+          { time: "17:00 - 17:50", subject: "Основы компьютерного моделирования", type: "Лекция", teacher: "Тайлақ Б.Е.", room: "1/306", badgeColor: "blue" }
+        ]
+      },
+      tue: {
+        title: "Вторник",
+        classes: [
+          { time: "12:00 - 12:50", subject: "Компьютерные сети (Cisco)", type: "Лекция", teacher: "Сатаев Б.О.", room: "2/302", badgeColor: "blue" },
+          { time: "13:00 - 13:50", subject: "Основы информационных систем", type: "Лекция", teacher: "Тайлақ Б.Е.", room: "2/302", badgeColor: "blue" },
+          { time: "14:00 - 14:50", subject: "Инженерная и компьютерная графика", type: "Лабораторная", teacher: "Даян А.", room: "3/508", badgeColor: "purple" },
+          { time: "15:00 - 15:50", subject: "Инженерная и компьютерная графика", type: "Лабораторная", teacher: "Даян А.", room: "3/508", badgeColor: "purple" }
+        ]
+      },
+      wed: {
+        title: "Среда",
+        classes: [
+          { time: "08:00 - 08:50", subject: "Основы компьютерного моделирования", type: "Лабораторная", teacher: "Саттыкова У.", room: "3/503", badgeColor: "purple" },
+          { time: "09:00 - 09:50", subject: "Основы компьютерного моделирования", type: "Лабораторная", teacher: "Саттыкова У.", room: "3/503", badgeColor: "purple" },
+          { time: "12:00 - 12:50", subject: "Инженерная и компьютерная графика", type: "Лекция", teacher: "Токишева Г.С.", room: "3/501", badgeColor: "blue" }
+        ]
+      },
+      thu: {
+        title: "Четверг",
+        classes: [
+          { time: "14:00 - 14:50", subject: "Физическая культура", type: "Практика", teacher: "Сатбаев Е.К.", room: "Спортзал", badgeColor: "emerald" },
+          { time: "15:00 - 15:50", subject: "Физическая культура", type: "Практика", teacher: "Сатбаев Е.К.", room: "Спортзал", badgeColor: "emerald" }
+        ]
+      },
+      fri: {
+        title: "Пятница",
+        classes: []
+      },
+      sat: {
+        title: "Суббота",
+        classes: [
+          { time: "10:00 - 10:50", subject: "Компьютерные сети (Cisco)", type: "Лабораторная", teacher: "Сеилов А.", room: "3/515", badgeColor: "purple" },
+          { time: "11:00 - 11:50", subject: "Компьютерные сети (Cisco)", type: "Лабораторная", teacher: "Сеилов А.", room: "3/515", badgeColor: "purple" },
+          { time: "12:00 - 12:50", subject: "Теория вероятностей и мат. статистика", type: "Практика", teacher: "Нуралбаева Д.Б.", room: "3/509", badgeColor: "emerald" },
+          { time: "13:00 - 13:50", subject: "Теория вероятностей и мат. статистика", type: "Практика", teacher: "Нуралбаева Д.Б.", room: "3/509", badgeColor: "emerald" }
+        ]
+      }
+    };
+
+    const typeBadges = {
+      blue: "bg-sky-500/15 text-sky-400 border-sky-500/30",
+      purple: "bg-purple-500/15 text-purple-400 border-purple-500/30",
+      emerald: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+    };
+
+    function selectDay(dayKey) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active-tab');
+        btn.classList.add('inactive-tab');
+      });
+      const activeBtn = document.getElementById(`tab-${dayKey}`);
+      activeBtn.classList.remove('inactive-tab');
+      activeBtn.classList.add('active-tab');
+
+      const dayData = scheduleData[dayKey];
+      document.getElementById('dayTitle').innerText = dayData.title;
+      document.getElementById('lessonCount').innerText = dayData.classes.length > 0 
+        ? `${dayData.classes.length} пар(ы)` 
+        : 'Выходной день';
+
+      const container = document.getElementById('scheduleContainer');
+      
+      if (dayData.classes.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 border border-dashed border-slate-700/60 rounded-2xl bg-slate-800/30">
+            <div class="text-3xl mb-2">🎉</div>
+            <div class="text-slate-300 font-semibold text-sm">Занятий нет</div>
+            <div class="text-slate-500 text-xs mt-1">Отдыхайте и готовьтесь к хакатону!</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = dayData.classes.map(item => `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl bg-slate-700/40 border border-slate-700/60 hover:border-slate-600 transition duration-150 gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-md border ${typeBadges[item.badgeColor]}">
+                ${item.type}
+              </span>
+              <span class="text-xs text-slate-400 font-mono">${item.time}</span>
+            </div>
+            <h3 class="font-bold text-slate-100 text-sm leading-snug">${item.subject}</h3>
+            <p class="text-xs text-slate-400">👨‍🏫 ${item.teacher}</p>
+          </div>
+          <div class="self-start sm:self-center bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-300 whitespace-nowrap">
+            📍 Ауд. <span class="text-blue-400 font-bold">${item.room}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Выбираем понедельник при старте
+    selectDay('mon');
+  </script>
+</body>
+</html>
